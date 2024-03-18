@@ -61,33 +61,6 @@ def review_menu(username):
         clock.tick(60)
 
 
-def practice_menu(username):
-    pygame.init()
-    clock = pygame.time.Clock()
-    screen_width = 700
-    screen_height = 700
-    screen = pygame.display.set_mode((screen_width, screen_height))
-    pygame.display.set_caption("Sprachenspiel Practice Menu")
-    base_font = pygame.font.Font(None, 32)
-    headline_font = pygame.font.Font(None, 100)
-    # Add other elements and functionality for the practice menu
-
-    running = True
-    while running:
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                pygame.quit()
-                sys.exit()
-            # Add event handling for the practice menu
-
-        screen.fill((0, 0, 0))
-
-        # Add rendering for practice menu elements
-
-        pygame.display.flip()
-        clock.tick(60)
-
-
 def main_menu(username):
     pygame.init()
     clock = pygame.time.Clock()
@@ -100,11 +73,11 @@ def main_menu(username):
     score_font = pygame.font.Font(None, 32)
 
     # Load the background image
-    background_image = pygame.image.load("images/ex1.png").convert()  # Load the image
+    background_image = pygame.image.load("../images/bg3.jpg").convert()  # Load the image
     background_image = pygame.transform.scale(background_image, (screen_width, screen_height))  # Scale the image to fit the screen
 
     # Load the image
-    cat_image = pygame.image.load("images/traced-cat.jpg")  # Change "your_image_path.jpg" to the actual path of your image
+    cat_image = pygame.image.load("../images/traced-cat.jpg")  # Change "your_image_path.jpg" to the actual path of your image
     cat_image = pygame.transform.scale(cat_image, (300, 300))  # Adjust desired_width and desired_height
     cat_image_rect = cat_image.get_rect()
     # Set the position of the image
@@ -114,8 +87,8 @@ def main_menu(username):
     button_width = 200
     button_height = 50
     button_spacing = 50
-    practice_button_rect = pygame.Rect((screen_width - button_width) // 2, 275, button_width, button_height)
-    review_button_rect = pygame.Rect((screen_width - button_width) // 2, 275 + button_height + button_spacing, button_width, button_height)
+    practice_button_rect = pygame.Rect((screen_width - button_width) // 2, 250, button_width, button_height)
+    review_button_rect = pygame.Rect((screen_width - button_width) // 2, 250 + button_height + button_spacing, button_width, button_height)
     button_color = pygame.Color("red")
     button_text_color = pygame.Color("white")
     practice_button_text = "Practice"
@@ -133,8 +106,7 @@ def main_menu(username):
             if event.type == pygame.MOUSEBUTTONDOWN:
                 if practice_button_rect.collidepoint(event.pos):
                     print("Practice button clicked")
-                    practice_menu(username)  # Open the practice menu
-                    return  # Close the main menu window
+                    # Add your practice button functionality here
                 elif review_button_rect.collidepoint(event.pos):
                     print("Review button clicked")
                     review_menu(username)  # Open the review menu
@@ -150,7 +122,7 @@ def main_menu(username):
 
         # Welcome message
         welcome_message = base_font.render(f"Welcome {username}!", True, (0, 0, 0))
-        screen.blit(welcome_message, ((screen_width - welcome_message.get_width()) // 2, 150))
+        screen.blit(welcome_message, ((screen_width - welcome_message.get_width()) // 2, 180))
 
         # Render the buttons
         pygame.draw.rect(screen, button_color, practice_button_rect)
@@ -165,11 +137,11 @@ def main_menu(username):
 
         # Render the score
         score_label = score_font.render(f"Score: {score}", True, (0, 0, 0))
-        screen.blit(score_label, (70, 485))
+        screen.blit(score_label, ((screen_width - score_label.get_width()) // 2, 500))
 
         # Render the difficulty level
         level_label = score_font.render(f"Difficulty: {level}", True, (0, 0, 0))
-        screen.blit(level_label, (525, 485))
+        screen.blit(level_label, ((screen_width - level_label.get_width()) // 2, 525))
 
         pygame.display.flip()
         clock.tick(60)
@@ -186,10 +158,6 @@ def login_menu():
     headline_font = pygame.font.Font(None, 100)
     user_text1 = ""  # Text for the first input box
     user_text2 = ""  # Text for the second input box
-
-    # Load the background image
-    background_image = pygame.image.load("images/ex1.png").convert()  # Load the image
-    background_image = pygame.transform.scale(background_image, (screen_width, screen_height))  # Scale the image to fit the screen
 
     # Define the fixed width for the input boxes
     fixed_input_width = 400
@@ -258,7 +226,7 @@ def login_menu():
                     elif len(user_text2) < 20:  # Limiting user to use only 20 characters
                         user_text2 += event.unicode
 
-        screen.blit(background_image, (0, 0))
+        screen.fill((0, 0, 0))
 
         # Headline label
         headline_label = headline_font.render("Sprachenspiel", True, (255, 255, 255))

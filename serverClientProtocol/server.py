@@ -18,3 +18,5 @@ with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as server_socket:
     conn, addr = server_socket.accept()
     with conn:
         print('Connected by', addr)
+        # Send the message to show the login menu
+        conn.sendall(b'SHOW_LOGIN_MENU')
