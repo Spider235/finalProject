@@ -8,6 +8,11 @@ class VocabularyExercise:
         self.screen = screen
         self.left_buttons = []
         self.right_buttons = []
+        self.selected_left_button = None
+        self.selected_right_button = None
+        self.correct_pairs = set()
+        self.left_clickable = [True] * 7
+        self.right_clickable = [True] * 7
 
         # Define button properties
         button_width = 150
@@ -38,27 +43,18 @@ class VocabularyExercise:
                                             button_width, button_height)
             self.right_buttons.append((right_button_rect, german_word))
 
-        # Variables to track selected buttons and correctness
-        self.selected_left_button = None
-        self.selected_right_button = None
-        self.correct_pair = None
-
     def handle_click(self, pos):
-        # Check if a left button is clicked
-        for button_rect, english_word in self.left_buttons:
-            if button_rect.collidepoint(pos):
+        for i, (button_rect, english_word) in enumerate(self.left_buttons):
+            if button_rect.collidepoint(pos) and self.left_clickable[i]:
                 self.selected_left_button = (button_rect, english_word)
                 return
 
-        # Check if a right button is clicked
-        for button_rect, german_word in self.right_buttons:
-            if button_rect.collidepoint(pos):
-                # Translate the German word to English on button click
+        for i, (button_rect, german_word) in enumerate(self.right_buttons):
+            if button_rect.collidepoint(pos) and self.right_clickable[i]:
                 translated_word = GoogleTranslator(source='german', target='english').translate(german_word)
                 self.selected_right_button = (button_rect, translated_word)
                 return
 
-        # If no button is clicked, reset selections
         self.selected_left_button = None
         self.selected_right_button = None
 
@@ -67,24 +63,39 @@ class VocabularyExercise:
             left_button_rect, english_word = self.selected_left_button
             right_button_rect, translated_word = self.selected_right_button
 
-            # Convert both words to lowercase for case-insensitive comparison
             english_word_lower = english_word.lower()
             translated_word_lower = translated_word.lower()
 
-            # Check if the lowercase English word matches the lowercase translated word
             if english_word_lower == translated_word_lower:
-                self.correct_pair = (self.selected_left_button, self.selected_right_button)
+                self.correct_pairs.add((english_word, translated_word))
                 print("Correct")  # Debug print statement
+                self.selected_left_button = None
+                self.selected_right_button = None
+                return True
             else:
-                self.correct_pair = None
                 print("Incorrect")  # Debug print statement
+                self.selected_left_button = None
+                self.selected_right_button = None
+                return False
+
+    def update_clickable(self):
+        for left_word, right_word in self.correct_pairs:
+            for i, (left_button_rect, left_word_check) in enumerate(self.left_buttons):
+                if left_word_check == left_word:
+                    self.left_clickable[i] = False
+                    break
+            for i, (right_button_rect, right_word_check) in enumerate(self.right_buttons):
+                if right_word_check == right_word:
+                    self.right_clickable[i] = False
+                    break
 
     def draw(self):
         self.screen.fill((0, 0, 0))  # Clear the screen
 
         # Draw left buttons with English words
-        for button_rect, english_word in self.left_buttons:
-            pygame.draw.rect(self.screen, (255, 255, 255), button_rect)  # White fill
+        for i, (button_rect, english_word) in enumerate(self.left_buttons):
+            color = (255, 255, 255) if self.left_clickable[i] else (150, 150, 150)
+            pygame.draw.rect(self.screen, color, button_rect)  # White fill
             pygame.draw.rect(self.screen, (0, 0, 0), button_rect, 2)  # Black border
             button_font = pygame.font.Font(None, 24)
             button_text = button_font.render(english_word, True, (0, 0, 0))
@@ -92,8 +103,9 @@ class VocabularyExercise:
             self.screen.blit(button_text, button_text_rect)
 
         # Draw right buttons with German words
-        for button_rect, german_word in self.right_buttons:
-            pygame.draw.rect(self.screen, (255, 255, 255), button_rect)  # White fill
+        for i, (button_rect, german_word) in enumerate(self.right_buttons):
+            color = (255, 255, 255) if self.right_clickable[i] else (150, 150, 150)
+            pygame.draw.rect(self.screen, color, button_rect)  # White fill
             pygame.draw.rect(self.screen, (0, 0, 0), button_rect, 2)  # Black border
             button_font = pygame.font.Font(None, 24)
             button_text = button_font.render(german_word, True, (0, 0, 0))
@@ -108,17 +120,23 @@ class VocabularyExercise:
             pygame.draw.rect(self.screen, (0, 255, 0), self.selected_right_button[0],
                              2)  # Green border for selected right button
 
-        # Draw green border for correct pair
-        if self.correct_pair:
-            pygame.draw.rect(self.screen, (0, 255, 0), self.correct_pair[0][0],
-                             2)  # Green border for correct left button
-            pygame.draw.rect(self.screen, (0, 255, 0), self.correct_pair[1][0],
-                             2)  # Green border for correct right button
+        # Draw green border and fill for correct pairs
+        for left_word, right_word in self.correct_pairs:
+            left_button_rects = [button_rect for button_rect, word in self.left_buttons if word == left_word]
+            right_button_rects = [button_rect for button_rect, word in self.right_buttons if word == right_word]
+            if left_button_rects and right_button_rects:
+                left_button_rect = left_button_rects[0]
+                right_button_rect = right_button_rects[0]
+                pygame.draw.rect(self.screen, (0, 255, 0), left_button_rect, 2)  # Green border for left button
+                pygame.draw.rect(self.screen, (0, 255, 0), right_button_rect, 2)  # Green border for right button
+                if not self.left_clickable[self.left_buttons.index((left_button_rect, left_word))]:
+                    pygame.draw.rect(self.screen, (0, 255, 0), left_button_rect)  # Green fill for left button
+                if not self.right_clickable[self.right_buttons.index((right_button_rect, right_word))]:
+                    pygame.draw.rect(self.screen, (0, 255, 0), right_button_rect)  # Green fill for right button
 
         pygame.display.flip()  # Flip the screen after all drawing operations
 
 
-# Example usage:
 if __name__ == "__main__":
     pygame.init()
     screen_width = 700
@@ -135,7 +153,9 @@ if __name__ == "__main__":
                 running = False
             elif event.type == pygame.MOUSEBUTTONDOWN:
                 exercise.handle_click(event.pos)
-                exercise.check_correctness()  # Check correctness after each click
+                correct = exercise.check_correctness()  # Check correctness after each click
+                if correct:
+                    exercise.update_clickable()
 
         exercise.draw()
 
