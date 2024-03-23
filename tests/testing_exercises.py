@@ -20,8 +20,8 @@ class VocabularyExercise:
         button_spacing = 40  # Adjusted spacing between buttons
 
         # English and German word lists (replace with your own words)
-        self.english_words = ["Dog", "Cat", "Bird", "Horse", "Rabbit", "Mouse", "Elephant"]
-        self.german_words = ["Hund", "Katze", "Vogel", "Pferd", "Kanin", "Maus", "Elefant"]
+        self.english_words = ["Dog", "Cat", "Bird", "Horse", "Fish", "Mouse", "Elephant"]
+        self.german_words = ["Hund", "Katze", "Vogel", "Pferd", "Fisch", "Maus", "Elefant"]
 
         # Randomly shuffle word lists
         random.shuffle(self.english_words)
@@ -60,34 +60,28 @@ class VocabularyExercise:
 
     def check_correctness(self):
         if self.selected_left_button and self.selected_right_button:
-            left_button_rect, english_word = self.selected_left_button
-            right_button_rect, translated_word = self.selected_right_button
-
-            english_word_lower = english_word.lower()
-            translated_word_lower = translated_word.lower()
-
-            if english_word_lower == translated_word_lower:
-                self.correct_pairs.add((english_word, translated_word))
-                print("Correct")  # Debug print statement
+            left_button_rect, german_word = self.selected_left_button
+            right_button_rect, english_word = self.selected_right_button
+            if german_word.lower() == english_word.lower():  # Case-insensitive comparison
+                self.correct_pairs.add((german_word, english_word))  # Store German and English word pair
                 self.selected_left_button = None
                 self.selected_right_button = None
                 return True
             else:
-                print("Incorrect")  # Debug print statement
                 self.selected_left_button = None
                 self.selected_right_button = None
                 return False
 
     def update_clickable(self):
-        for left_word, right_word in self.correct_pairs:
+        for german_word, english_word in self.correct_pairs:
+            # Re-translate the English word back to German
+            retranslated_german_word = GoogleTranslator(source='english', target='german').translate(english_word)
             for i, (left_button_rect, left_word_check) in enumerate(self.left_buttons):
-                if left_word_check == left_word:
+                if left_word_check.strip().lower() == german_word.strip().lower():  # Case-insensitive comparison
                     self.left_clickable[i] = False
-                    break
             for i, (right_button_rect, right_word_check) in enumerate(self.right_buttons):
-                if right_word_check == right_word:
+                if right_word_check.strip().lower() == retranslated_german_word.strip().lower():  # Case-insensitive comparison
                     self.right_clickable[i] = False
-                    break
 
     def draw(self):
         self.screen.fill((0, 0, 0))  # Clear the screen
