@@ -1,3 +1,4 @@
+import time
 import pygame
 import random
 from deep_translator import GoogleTranslator
@@ -6,6 +7,17 @@ from deep_translator import GoogleTranslator
 class VocabularyExercise:
     def __init__(self, screen):
         self.screen = screen
+        self.background = pygame.image.load(r"C:\Users\nurim\PycharmProjects\finalProject\images\ex2.png")  # Load the background image
+        self.background = pygame.transform.scale(self.background, (700, 700))  # Scale the image to fit the screen
+        self.score = 0  # Initialize score
+        self.font = pygame.font.Font(None, 36)  # Initialize font for score text
+        self.animal_image = pygame.image.load(r"C:\Users\nurim\PycharmProjects\finalProject\images\traced-unicorn.jpg")  # Load the image of the animal
+        self.animal_image = pygame.transform.scale(self.animal_image, (275, 275))  # Scale the image
+        self.message_box_font = pygame.font.Font(None, 36)
+        self.message_box_color = (255, 255, 255)
+        self.message_duration = 2  # Duration of message box in seconds
+        self.message_timer = 0
+        self.message_text = ""
         self.left_buttons = []
         self.right_buttons = []
         self.selected_left_button = None
@@ -13,6 +25,9 @@ class VocabularyExercise:
         self.correct_pairs = set()
         self.left_clickable = [True] * 7
         self.right_clickable = [True] * 7
+        # Load sound files for correct and wrong answers
+        self.correct_sound = pygame.mixer.Sound(r"C:\Users\nurim\PycharmProjects\finalProject\Sounds\correct.wav")
+        self.wrong_sound = pygame.mixer.Sound(r"C:\Users\nurim\PycharmProjects\finalProject\Sounds\wrong.wav")
 
         # Define button properties
         button_width = 150
@@ -43,6 +58,18 @@ class VocabularyExercise:
                                             button_width, button_height)
             self.right_buttons.append((right_button_rect, german_word))
 
+    def display_message_box(self, message):
+        self.message_text = message
+        self.message_timer = time.time() + self.message_duration
+
+    def update_score(self, correct):
+        if correct:
+            self.score += 100
+        else:
+            self.score -= 50
+            if self.score < 0:
+                self.score = 0  # Ensure score doesn't go negative
+
     def handle_click(self, pos):
         for i, (button_rect, english_word) in enumerate(self.left_buttons):
             if button_rect.collidepoint(pos) and self.left_clickable[i]:
@@ -64,10 +91,14 @@ class VocabularyExercise:
             right_button_rect, english_word = self.selected_right_button
             if german_word.lower() == english_word.lower():  # Case-insensitive comparison
                 self.correct_pairs.add((german_word, english_word))  # Store German and English word pair
+                self.display_message_box(random.choice(["amazing!", "great!", "wonderful!"]))
+                self.correct_sound.play()  # Play correct sound
                 self.selected_left_button = None
                 self.selected_right_button = None
                 return True
             else:
+                self.display_message_box("Try again")
+                self.wrong_sound.play()  # Play wrong sound
                 self.selected_left_button = None
                 self.selected_right_button = None
                 return False
@@ -83,8 +114,32 @@ class VocabularyExercise:
                 if right_word_check.strip().lower() == retranslated_german_word.strip().lower():  # Case-insensitive comparison
                     self.right_clickable[i] = False
 
+    def update(self):
+        # Update the message box timer
+        if time.time() > self.message_timer:
+            self.message_text = ""
+
     def draw(self):
-        self.screen.fill((0, 0, 0))  # Clear the screen
+        # Blit the background image onto the screen
+        self.screen.blit(self.background, (0, 0))
+
+        # Draw score text on the middle top of the screen
+        score_text = self.font.render(f"Score: {self.score}", True, (255, 255, 255))
+        score_text_rect = score_text.get_rect(center=(screen_width // 2, 30))  # Position the text in the middle top
+        self.screen.blit(score_text, score_text_rect)
+
+        # Draw the animal image in the middle of the screen
+        screen_center_x = self.screen.get_width() // 2
+        screen_center_y = self.screen.get_height() // 2
+        image_rect = self.animal_image.get_rect(center=(screen_center_x, 575))
+        self.screen.blit(self.animal_image, image_rect)
+
+        # Draw message box if necessary
+        if time.time() < self.message_timer:
+            message_surface = self.message_box_font.render(self.message_text, True, self.message_box_color)
+            message_rect = message_surface.get_rect(center=(screen_center_x, 425))
+            pygame.draw.rect(self.screen, (0, 0, 0), message_rect)  # Draw message box background
+            self.screen.blit(message_surface, message_rect.topleft)
 
         # Draw left buttons with English words
         for i, (button_rect, english_word) in enumerate(self.left_buttons):
@@ -147,9 +202,15 @@ if __name__ == "__main__":
                 running = False
             elif event.type == pygame.MOUSEBUTTONDOWN:
                 exercise.handle_click(event.pos)
-                correct = exercise.check_correctness()  # Check correctness after each click
-                if correct:
-                    exercise.update_clickable()
+
+                # Check if both a left button and a right button have been clicked
+                if exercise.selected_left_button is not None and exercise.selected_right_button is not None:
+                    correct = exercise.check_correctness()  # Check correctness after both buttons are clicked
+
+                    if correct:
+                        exercise.update_clickable()
+
+                    exercise.update_score(correct)  # Update score after both buttons are clicked
 
         exercise.draw()
 
