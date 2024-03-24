@@ -91,7 +91,7 @@ class VocabularyExercise:
             right_button_rect, english_word = self.selected_right_button
             if german_word.lower() == english_word.lower():  # Case-insensitive comparison
                 self.correct_pairs.add((german_word, english_word))  # Store German and English word pair
-                self.display_message_box(random.choice(["amazing!", "great!", "wonderful!"]))
+                self.display_message_box(random.choice(["Amazing!", "Great!", "Wonderful!", "Awesome!"]))
                 self.correct_sound.play()  # Play correct sound
                 self.selected_left_button = None
                 self.selected_right_button = None
