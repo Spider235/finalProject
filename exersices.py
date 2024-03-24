@@ -25,6 +25,9 @@ class VocabularyExercise:
         self.correct_pairs = set()
         self.left_clickable = [True] * 7
         self.right_clickable = [True] * 7
+        # Load sound files for correct and wrong answers
+        self.correct_sound = pygame.mixer.Sound(r"C:\Users\nurim\PycharmProjects\finalProject\Sounds\correct.wav")
+        self.wrong_sound = pygame.mixer.Sound(r"C:\Users\nurim\PycharmProjects\finalProject\Sounds\wrong.wav")
 
         # Define button properties
         button_width = 150
@@ -89,11 +92,13 @@ class VocabularyExercise:
             if german_word.lower() == english_word.lower():  # Case-insensitive comparison
                 self.correct_pairs.add((german_word, english_word))  # Store German and English word pair
                 self.display_message_box(random.choice(["amazing!", "great!", "wonderful!"]))
+                self.correct_sound.play()  # Play correct sound
                 self.selected_left_button = None
                 self.selected_right_button = None
                 return True
             else:
                 self.display_message_box("Try again")
+                self.wrong_sound.play()  # Play wrong sound
                 self.selected_left_button = None
                 self.selected_right_button = None
                 return False
