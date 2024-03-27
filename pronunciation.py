@@ -18,6 +18,7 @@ class GermanPronunciationExercise:
         self.play_button_rect = pygame.Rect(self.button_x, self.play_button_y, self.button_width, self.button_height)
         self.record_button_rect = pygame.Rect(self.button_x, self.record_button_y, self.button_width, self.button_height)
         self.text_font = pygame.font.Font(None, 36)
+        self.score = 0  # Initialize score counter
 
     def play_word(self):
         tts = gTTS(text=self.word, lang='de')
@@ -40,8 +41,10 @@ class GermanPronunciationExercise:
             user_input = recognizer.recognize_google(audio, language='de-DE')
             if user_input.lower() == self.word.lower():
                 print("Correct pronunciation!")
+                self.score += 100
             else:
                 print("Incorrect pronunciation. Try again.")
+                self.score = max(0, self.score - 50)  # Ensure score doesn't go below 0
         except sr.UnknownValueError:
             print("Could not understand audio")
         except sr.RequestError as e:
@@ -50,6 +53,11 @@ class GermanPronunciationExercise:
     def draw(self):
         background_image = pygame.image.load("images/ex3.png")
         self.screen.blit(background_image, (0, 0))
+
+        # Display score on the screen
+        score_text = self.text_font.render(f"Score: {self.score}", True, (0, 0, 0))
+        score_text_rect = score_text.get_rect(center=(self.screen.get_width() // 2, 50))
+        self.screen.blit(score_text, score_text_rect)
 
         pygame.draw.rect(self.screen, (0, 255, 0), self.play_button_rect)
         pygame.draw.rect(self.screen, (255, 0, 0), self.record_button_rect)
