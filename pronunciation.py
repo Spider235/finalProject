@@ -48,7 +48,7 @@ class GermanPronunciationExercise:
             print("Could not request results; {0}".format(e))
 
     def draw(self):
-        background_image = pygame.image.load("images/ex1.png")
+        background_image = pygame.image.load("images/ex3.png")
         self.screen.blit(background_image, (0, 0))
 
         pygame.draw.rect(self.screen, (0, 255, 0), self.play_button_rect)

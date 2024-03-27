@@ -361,7 +361,7 @@ if __name__ == "__main__":
     screen = pygame.display.set_mode((screen_width, screen_height))
     pygame.display.set_caption("Sentence Exercise")
 
-    exercise = SentenceExerciseEnglish(screen)  # chnage it accoringly for the exercise
+    exercise = SentenceExerciseGerman(screen)  # chnage it accoringly for the exercise
 
     running = True
     while running:
