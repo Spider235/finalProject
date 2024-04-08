@@ -6,7 +6,8 @@ from sentence_building import SentenceExerciseGerman
 
 
 class VocabularyExercise:
-    def __init__(self, screen):
+    def __init__(self, screen, next_callback=None):
+        self.next_callback = next_callback
         self.screen = screen
         self.background = pygame.image.load(r"C:\Users\nurim\PycharmProjects\finalProject\images\ex2.png")  # Load the background image
         self.background = pygame.transform.scale(self.background, (700, 700))  # Scale the image to fit the screen
@@ -226,10 +227,10 @@ class VocabularyExercise:
 
                     # Check if "Next" button is clicked and exercise is completed
                     if self.completed() and 275 <= event.pos[0] <= 425 and 650 <= event.pos[1] <= 690:
-                        # Move to the next exercise (replace with the instantiation of the next exercise class)
-                        next_exercise = SentenceExerciseGerman(screen)
-                        next_exercise.run(screen)
-                        return  # Exit the current run method after moving to the next exercise
+                        # Move to the next exercise by calling the callback function
+                        if self.next_callback:
+                            self.next_callback()
+                            return  # Exit the current run method after moving to the next exercise
 
             self.draw()
 
