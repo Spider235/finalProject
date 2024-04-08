@@ -2,6 +2,7 @@ import time
 import pygame
 import random
 from deep_translator import GoogleTranslator
+from sentence_building import SentenceExerciseGerman
 
 
 class VocabularyExercise:
@@ -10,6 +11,7 @@ class VocabularyExercise:
         self.background = pygame.image.load(r"C:\Users\nurim\PycharmProjects\finalProject\images\ex2.png")  # Load the background image
         self.background = pygame.transform.scale(self.background, (700, 700))  # Scale the image to fit the screen
         self.score = 0  # Initialize score
+        self.correct_pairs_count = 0  # Initialize correct pairs count
         self.font = pygame.font.Font(None, 36)  # Initialize font for score text
         self.animal_image = pygame.image.load(r"C:\Users\nurim\PycharmProjects\finalProject\images\traced-unicorn.jpg")  # Load the image of the animal
         self.animal_image = pygame.transform.scale(self.animal_image, (275, 275))  # Scale the image
@@ -95,6 +97,8 @@ class VocabularyExercise:
                 self.correct_sound.play()  # Play correct sound
                 self.selected_left_button = None
                 self.selected_right_button = None
+                self.correct_pairs_count += 1
+                print("Correct pairs count:", self.correct_pairs_count)
                 return True
             else:
                 self.display_message_box("Try again")
@@ -125,7 +129,7 @@ class VocabularyExercise:
 
         # Draw score text on the middle top of the screen
         score_text = self.font.render(f"Score: {self.score}", True, (255, 255, 255))
-        score_text_rect = score_text.get_rect(center=(screen_width // 2, 30))  # Position the text in the middle top
+        score_text_rect = score_text.get_rect(center=(350, 30))  # Position the text in the middle top
         self.screen.blit(score_text, score_text_rect)
 
         # Draw the animal image in the middle of the screen
@@ -183,7 +187,53 @@ class VocabularyExercise:
                 if not self.right_clickable[self.right_buttons.index((right_button_rect, right_word))]:
                     pygame.draw.rect(self.screen, (0, 255, 0), right_button_rect)  # Green fill for right button
 
+        # Draw "Next" button if exercise is completed
+        if self.completed():
+            next_button_font = pygame.font.Font(None, 36)
+            next_button_text = next_button_font.render("Next", True, (255, 255, 255))
+            next_button_rect = next_button_text.get_rect(center=(screen_center_x, 675))
+            pygame.draw.rect(self.screen, (0, 255, 0), next_button_rect)  # Green fill for "Next" button
+            pygame.draw.rect(self.screen, (0, 0, 0), next_button_rect, 2)  # Black border for "Next" button
+            self.screen.blit(next_button_text, next_button_rect.topleft)
+
         pygame.display.flip()  # Flip the screen after all drawing operations
+
+    def completed(self):
+        return self.correct_pairs_count == 7
+
+    def run(self):
+        pygame.init()
+        screen_width = 700
+        screen_height = 700
+        screen = pygame.display.set_mode((screen_width, screen_height))
+        pygame.display.set_caption("Vocabulary Exercise")
+
+        running = True
+        while running:
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    running = False
+                elif event.type == pygame.MOUSEBUTTONDOWN:
+                    self.handle_click(event.pos)
+
+                    if self.selected_left_button is not None and self.selected_right_button is not None:
+                        correct = self.check_correctness()
+
+                        if correct:
+                            self.update_clickable()
+
+                        self.update_score(correct)
+
+                    # Check if "Next" button is clicked and exercise is completed
+                    if self.completed() and 275 <= event.pos[0] <= 425 and 650 <= event.pos[1] <= 690:
+                        # Move to the next exercise (replace with the instantiation of the next exercise class)
+                        next_exercise = SentenceExerciseGerman(screen)
+                        next_exercise.run(screen)
+                        return  # Exit the current run method after moving to the next exercise
+
+            self.draw()
+
+        pygame.quit()
 
 
 if __name__ == "__main__":
@@ -194,24 +244,6 @@ if __name__ == "__main__":
     pygame.display.set_caption("Vocabulary Exercise")
 
     exercise = VocabularyExercise(screen)
+    exercise.run()
 
-    running = True
-    while running:
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                running = False
-            elif event.type == pygame.MOUSEBUTTONDOWN:
-                exercise.handle_click(event.pos)
 
-                # Check if both a left button and a right button have been clicked
-                if exercise.selected_left_button is not None and exercise.selected_right_button is not None:
-                    correct = exercise.check_correctness()  # Check correctness after both buttons are clicked
-
-                    if correct:
-                        exercise.update_clickable()
-
-                    exercise.update_score(correct)  # Update score after both buttons are clicked
-
-        exercise.draw()
-
-    pygame.quit()

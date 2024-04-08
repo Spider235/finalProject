@@ -3,6 +3,8 @@ from deep_translator import GoogleTranslator
 from gtts import gTTS
 import os
 from tkinter import *
+from random_word import RandomWords
+
 
 translated = GoogleTranslator(source='english', target='german').translate("klein")  # output -> Weiter so, du bist großartig
 print(translated)
@@ -31,3 +33,8 @@ playsound.playsound('welcome.mp3')
 
 # Playing the converted file
 # os.system("welcome.mp3")
+
+r = RandomWords()
+
+# Return a single random word
+r.get_random_word()
