@@ -3,6 +3,7 @@ import random
 import pygame
 import sys
 from exersices import VocabularyExercise
+from pronunciation import GermanPronunciationExercise
 from sentence_building import SentenceExerciseEnglish
 from sentence_building import SentenceExerciseGerman
 
@@ -22,8 +23,8 @@ class Interface:
         self.button_height = 50
         self.button_color = pygame.Color("red")
         self.button_text_color = pygame.Color("white")
-        self.exercises = [VocabularyExercise(self.screen), SentenceExerciseEnglish(self.screen),
-                          SentenceExerciseGerman(self.screen)]
+        self.exercises = [VocabularyExercise(self.screen), SentenceExerciseGerman(self.screen),
+                          SentenceExerciseEnglish(self.screen), GermanPronunciationExercise(self.screen)]
 
     def review_menu(self, username):
         pygame.init()
@@ -83,11 +84,11 @@ class Interface:
             pygame.display.flip()
             clock.tick(60)
 
-    def practice_menu(self, username, current_exercise_index=0):
+    def practice_menu(self, username):
         # List of exercises
-        exercises = [VocabularyExercise(self.screen), SentenceExerciseGerman(self.screen), SentenceExerciseEnglish(self.screen)]  # Replace Exercise1, Exercise2, etc. with your exercise classes
+        exercises = self.exercises
 
-        current_exercise_index = 0
+        current_exercise_index = 2
         while current_exercise_index < len(exercises):
             exercise = exercises[current_exercise_index]
 
@@ -104,25 +105,10 @@ class Interface:
                 pygame.display.flip()
                 self.clock.tick(60)
 
-            # Draw "Next" button
-            self.screen.fill((0, 0, 0))
-            self.draw_next_button()
-
-            # Wait for user to click "Next" button
-            next_button_clicked = False
-            while not next_button_clicked:
-                for event in pygame.event.get():
-                    if event.type == pygame.QUIT:
-                        pygame.quit()
-                        sys.exit()
-                    elif event.type == pygame.MOUSEBUTTONDOWN:
-                        if self.next_button_rect.collidepoint(event.pos):
-                            next_button_clicked = True
-
-                pygame.display.flip()
-                self.clock.tick(60)
-
             current_exercise_index += 1
+
+        # After all exercises are completed, show a message or perform any other action
+        print("All exercises completed successfully!")
 
     def draw_next_button(self):
         font = pygame.font.Font(None, 36)

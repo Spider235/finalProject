@@ -12,13 +12,20 @@ class GermanPronunciationExercise:
         self.button_width = 200
         self.button_height = 80
         self.button_spacing = 20
-        self.button_x = (screen.get_width() - self.button_width) // 2
-        self.play_button_y = (screen.get_height() - (self.button_height * 2 + self.button_spacing)) // 2
+        self.button_x = (700 - self.button_width) // 2
+        self.play_button_y = (700 - (self.button_height * 2 + self.button_spacing)) // 2
         self.record_button_y = self.play_button_y + self.button_height + self.button_spacing
         self.play_button_rect = pygame.Rect(self.button_x, self.play_button_y, self.button_width, self.button_height)
         self.record_button_rect = pygame.Rect(self.button_x, self.record_button_y, self.button_width, self.button_height)
-        self.text_font = pygame.font.Font(None, 36)
+        self.text_font = pygame.font.Font(None, 32)
         self.score = 0  # Initialize score counter
+        self.completed_correctly = False  # Flag to track if the exercise is completed correctly
+        self.next_button_width = 100
+        self.next_button_height = 50
+        self.next_button_font = pygame.font.Font(None, 24)
+        self.next_button_color = (200, 200, 200)
+        self.next_button_rect = pygame.Rect((700 - self.next_button_width) // 2, 600,
+                                            self.next_button_width, self.next_button_height)
 
     def play_word(self):
         tts = gTTS(text=self.word, lang='de')
@@ -42,9 +49,11 @@ class GermanPronunciationExercise:
             if user_input.lower() == self.word.lower():
                 print("Correct pronunciation!")
                 self.score += 100
+                self.completed_correctly = True  # Set the flag if pronunciation is correct
             else:
                 print("Incorrect pronunciation. Try again.")
                 self.score = max(0, self.score - 50)  # Ensure score doesn't go below 0
+                self.completed_correctly = False  # Reset the flag if pronunciation is incorrect
         except sr.UnknownValueError:
             print("Could not understand audio")
         except sr.RequestError as e:
@@ -74,23 +83,50 @@ class GermanPronunciationExercise:
         word_text_rect = word_text.get_rect(center=(self.screen.get_width() // 2, 200))
         self.screen.blit(word_text, word_text_rect)
 
+        if self.completed_correctly:
+            # Draw the Next button if exercise completed correctly
+            pygame.draw.rect(self.screen, self.next_button_color, self.next_button_rect)
+            next_button_text = self.next_button_font.render("Next", True, (0, 0, 0))
+            next_button_text_rect = next_button_text.get_rect(center=self.next_button_rect.center)
+            self.screen.blit(next_button_text, next_button_text_rect)
+
+        pygame.display.flip()
+
+    def next_button_clicked(self, pos):
+        if self.next_button_rect.collidepoint(pos):
+            # Move to the next exercise (replace with the instantiation of the next exercise class)
+            next_exercise = GermanPronunciationExercise(self.screen)
+            next_exercise.run()
+            return True  # Return True to indicate that the button click was handled
+        return False  # Return False if the button click was not handled
+
     def handle_events(self):
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 return False
             elif event.type == pygame.MOUSEBUTTONDOWN:
+                if self.next_button_clicked(event.pos):  # Check if the Next button was clicked
+                    return False  # Exit the loop if the Next button was clicked
+
+                # Check if the Play Sound button was clicked
                 if self.play_button_rect.collidepoint(event.pos):
                     self.play_word()
-                elif self.record_button_rect.collidepoint(event.pos):
+
+                # Check if the Record button was clicked
+                if self.record_button_rect.collidepoint(event.pos):
                     self.record_and_check()
         return True
 
     def run(self):
         running = True
         while running:
+            # Handle events
             running = self.handle_events()
+
+            # Draw elements
             self.draw()
-            pygame.display.flip()
+
+        pygame.quit()
 
 
 if __name__ == "__main__":

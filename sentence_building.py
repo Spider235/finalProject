@@ -223,10 +223,13 @@ class SentenceExerciseGerman:  # This class is used to build sentences in German
 
     def next_button_clicked(self, pos):
         if self.next_button_rect.collidepoint(pos):
-            # Move to the next exercise (replace with the instantiation of the next exercise class)
-            next_exercise = SentenceExerciseEnglish(self.screen)
-            next_exercise.run(self.screen)
-            return True  # Return True to indicate that the button click was handled
+            if self.completed():
+                # Move to the next exercise (replace with the instantiation of the next exercise class)
+                next_exercise = SentenceExerciseEnglish(self.screen)
+                next_exercise.run()
+                return True  # Return True to indicate that the button click was handled
+            else:
+                return False  # Return False if the current exercise is not completed
         return False  # Return False if the button click was not handled
 
     def completed(self):
@@ -243,7 +246,7 @@ class SentenceExerciseGerman:  # This class is used to build sentences in German
         # Check if the correctness of the user's sentence has been verified
         return self.correctness_checked and self.correct_sentence_matched
 
-    def run(self, screen):
+    def run(self):
         running = True
         while running:
             for event in pygame.event.get():
@@ -252,8 +255,8 @@ class SentenceExerciseGerman:  # This class is used to build sentences in German
                 elif event.type == pygame.MOUSEBUTTONDOWN:
                     if self.next_button_clicked(event.pos):
                         # Move to the next exercise (replace with the instantiation of the next exercise class)
-                        next_exercise = SentenceExerciseEnglish(screen)
-                        next_exercise.run(screen)
+                        next_exercise = SentenceExerciseEnglish(self.screen)
+                        next_exercise.run()
                         return  # Exit the current run method after moving to the next exercise
                     elif self.check_button_clicked(event.pos):
                         self.check_correctness()
@@ -482,10 +485,13 @@ class SentenceExerciseEnglish:  # This class is used to build sentences in Germa
 
     def next_button_clicked(self, pos):
         if self.next_button_rect.collidepoint(pos):
-            # Move to the next exercise (replace with the instantiation of the next exercise class)
-            next_exercise = GermanPronunciationExercise(self.screen)
-            next_exercise.run()
-            return True  # Return True to indicate that the button click was handled
+            if self.completed():
+                # Move to the next exercise (replace with the instantiation of the next exercise class)
+                next_exercise = GermanPronunciationExercise(self.screen)
+                next_exercise.run()
+                return True  # Return True to indicate that the button click was handled
+            else:
+                return False  # Return False if the current exercise is not completed
         return False  # Return False if the button click was not handled
 
     def completed(self):
@@ -502,7 +508,7 @@ class SentenceExerciseEnglish:  # This class is used to build sentences in Germa
         # Check if the correctness of the user's sentence has been verified
         return self.correctness_checked and self.correct_sentence_matched
 
-    def run(self, screen):
+    def run(self):
         running = True
         while running:
             for event in pygame.event.get():
@@ -511,7 +517,7 @@ class SentenceExerciseEnglish:  # This class is used to build sentences in Germa
                 elif event.type == pygame.MOUSEBUTTONDOWN:
                     if self.next_button_clicked(event.pos):
                         # Move to the next exercise (replace with the instantiation of the next exercise class)
-                        next_exercise = GermanPronunciationExercise(screen)
+                        next_exercise = GermanPronunciationExercise(self.screen)
                         next_exercise.run()
                         return  # Exit the current run method after moving to the next exercise
                     elif self.check_button_clicked(event.pos):

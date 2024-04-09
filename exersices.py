@@ -230,7 +230,7 @@ class VocabularyExercise:
                         # Move to the next exercise by calling the callback function
                         if self.next_callback:
                             self.next_callback()
-                            return  # Exit the current run method after moving to the next exercise
+                        return  # Exit the current run method after moving to the next exercise
 
             self.draw()
 
