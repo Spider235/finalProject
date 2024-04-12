@@ -6,12 +6,13 @@ from exersices import VocabularyExercise
 from pronunciation import GermanPronunciationExercise
 from sentence_building import SentenceExerciseEnglish
 from sentence_building import SentenceExerciseGerman
+pygame.init()
 
 
 class Interface:
     def __init__(self):
         self.next_button_rect = None
-        pygame.init()
+        self.current_exercise_index = 0
         self.clock = pygame.time.Clock()
         self.screen_width = 700
         self.screen_height = 700
@@ -27,7 +28,6 @@ class Interface:
                           SentenceExerciseEnglish(self.screen), GermanPronunciationExercise(self.screen)]
 
     def review_menu(self, username):
-        pygame.init()
         clock = pygame.time.Clock()
         screen_width = 700
         screen_height = 700
@@ -85,12 +85,9 @@ class Interface:
             clock.tick(60)
 
     def practice_menu(self, username):
-        # List of exercises
-        exercises = self.exercises
-
-        current_exercise_index = 2
-        while current_exercise_index < len(exercises):
-            exercise = exercises[current_exercise_index]
+        while self.current_exercise_index < (len(self.exercises)):
+            exercise = self.exercises[self.current_exercise_index]
+            exercise.reset()
 
             # Run the current exercise
             exercise.run()
@@ -105,10 +102,14 @@ class Interface:
                 pygame.display.flip()
                 self.clock.tick(60)
 
-            current_exercise_index += 1
+            # Increment the index to move to the next exercise
+            self.current_exercise_index += 1
 
-        # After all exercises are completed, show a message or perform any other action
-        print("All exercises completed successfully!")
+        # Reset current exercise index after completing all exercises
+        self.current_exercise_index = 0
+
+        # After all exercises are completed, return to the main menu
+        self.main_menu(username)
 
     def draw_next_button(self):
         font = pygame.font.Font(None, 36)

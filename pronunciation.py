@@ -7,6 +7,7 @@ import speech_recognition as sr
 
 class GermanPronunciationExercise:
     def __init__(self, screen):
+        pygame.font.init()
         self.screen = screen
         self.word = "Bruder"  # Example German word
         self.button_width = 200
@@ -95,8 +96,8 @@ class GermanPronunciationExercise:
     def next_button_clicked(self, pos):
         if self.next_button_rect.collidepoint(pos):
             # Move to the next exercise (replace with the instantiation of the next exercise class)
-            next_exercise = GermanPronunciationExercise(self.screen)
-            next_exercise.run()
+            # next_exercise = GermanPronunciationExercise(self.screen)
+            # next_exercise.run()
             return True  # Return True to indicate that the button click was handled
         return False  # Return False if the button click was not handled
 
@@ -117,6 +118,14 @@ class GermanPronunciationExercise:
                     self.record_and_check()
         return True
 
+    def completed(self):
+        return self.completed_correctly
+
+    def reset(self):
+        # Reset all relevant attributes to their initial state
+        self.score = 0
+        self.completed_correctly = False
+
     def run(self):
         running = True
         while running:
@@ -125,8 +134,6 @@ class GermanPronunciationExercise:
 
             # Draw elements
             self.draw()
-
-        pygame.quit()
 
 
 if __name__ == "__main__":

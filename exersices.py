@@ -202,6 +202,20 @@ class VocabularyExercise:
     def completed(self):
         return self.correct_pairs_count == 7
 
+    def reset(self):
+        # Reset all relevant attributes to their initial state
+        self.score = 0
+        self.correct_pairs_count = 0
+        self.message_text = ""
+        self.message_timer = 0
+        self.correct_pairs = set()
+        self.left_clickable = [True] * 7
+        self.right_clickable = [True] * 7
+        self.selected_left_button = None
+        self.selected_right_button = None
+        random.shuffle(self.english_words)
+        random.shuffle(self.german_words)
+
     def run(self):
         pygame.init()
         screen_width = 700

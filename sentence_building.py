@@ -2,8 +2,9 @@ import pygame
 import random
 import time
 from deep_translator import GoogleTranslator
-
 from pronunciation import GermanPronunciationExercise
+pygame.init()
+pygame.mixer.init()
 
 
 class SentenceExerciseGerman:  # This class is used to build sentences in German.
@@ -212,8 +213,6 @@ class SentenceExerciseGerman:  # This class is used to build sentences in German
         # Update the display
         pygame.display.flip()
 
-        pygame.display.flip()  # Flip the screen after all drawing operations
-
     def show_message(self, text):
         self.message_text = text
         self.message_timer = time.time() + 2  # Display message for 2 seconds
@@ -224,27 +223,22 @@ class SentenceExerciseGerman:  # This class is used to build sentences in German
     def next_button_clicked(self, pos):
         if self.next_button_rect.collidepoint(pos):
             if self.completed():
-                # Move to the next exercise (replace with the instantiation of the next exercise class)
-                next_exercise = SentenceExerciseEnglish(self.screen)
-                next_exercise.run()
                 return True  # Return True to indicate that the button click was handled
-            else:
-                return False  # Return False if the current exercise is not completed
         return False  # Return False if the button click was not handled
 
     def completed(self):
-        # Join the selected words to form the user's sentence
-        user_sentence = ' '.join(self.selected_words)
+        return self.correctness_checked or self.correct_sentence_matched
 
-        # Translate the displayed English sentence to German for comparison
-        correct_german_sentence = GoogleTranslator(source='english', target='german').translate(self.sentence)
-
-        # Normalize both sentences for comparison
-        user_sentence_normalized = user_sentence.replace('.', '').lower()
-        correct_german_sentence_normalized = correct_german_sentence.replace('.', '').lower()
-
-        # Check if the correctness of the user's sentence has been verified
-        return self.correctness_checked and self.correct_sentence_matched
+    def reset(self):
+        # Reset all relevant attributes to their initial state
+        self.score = 0
+        self.correctness_checked = False
+        self.correct_sentence_matched = False
+        self.selected_words = []
+        self.selected_rects = []
+        random.shuffle(self.german_words)
+        self.message_text = ""
+        self.message_timer = 0
 
     def run(self):
         running = True
@@ -255,8 +249,8 @@ class SentenceExerciseGerman:  # This class is used to build sentences in German
                 elif event.type == pygame.MOUSEBUTTONDOWN:
                     if self.next_button_clicked(event.pos):
                         # Move to the next exercise (replace with the instantiation of the next exercise class)
-                        next_exercise = SentenceExerciseEnglish(self.screen)
-                        next_exercise.run()
+                        # next_exercise = SentenceExerciseEnglish(self.screen)
+                        # next_exercise.run()
                         return  # Exit the current run method after moving to the next exercise
                     elif self.check_button_clicked(event.pos):
                         self.check_correctness()
@@ -274,7 +268,7 @@ class SentenceExerciseEnglish:  # This class is used to build sentences in Germa
         self.background_image = pygame.image.load(
             r"C:\Users\nurim\PycharmProjects\finalProject\images\ex1.png")  # Load the background image
         self.background_image = pygame.transform.scale(self.background_image, (
-            screen.get_width(), screen.get_height()))  # Scale the image to fit the screen
+            700, 700))  # Scale the image to fit the screen
         self.animal_image = pygame.image.load(
             r"C:\Users\nurim\PycharmProjects\finalProject\images\traced-cat.jpg")  # Load the image of the animal
         self.animal_image = pygame.transform.scale(self.animal_image, (275, 275))  # Scale the image
@@ -474,8 +468,6 @@ class SentenceExerciseEnglish:  # This class is used to build sentences in Germa
         # Update the display
         pygame.display.flip()
 
-        pygame.display.flip()  # Flip the screen after all drawing operations
-
     def show_message(self, text):
         self.message_text = text
         self.message_timer = time.time() + 2  # Display message for 2 seconds
@@ -486,39 +478,37 @@ class SentenceExerciseEnglish:  # This class is used to build sentences in Germa
     def next_button_clicked(self, pos):
         if self.next_button_rect.collidepoint(pos):
             if self.completed():
-                # Move to the next exercise (replace with the instantiation of the next exercise class)
-                next_exercise = GermanPronunciationExercise(self.screen)
-                next_exercise.run()
                 return True  # Return True to indicate that the button click was handled
-            else:
-                return False  # Return False if the current exercise is not completed
         return False  # Return False if the button click was not handled
 
     def completed(self):
-        # Join the selected words to form the user's sentence
-        user_sentence = ' '.join(self.selected_words)
-
-        # Translate the displayed English sentence to German for comparison
-        correct_german_sentence = GoogleTranslator(source='english', target='german').translate(self.sentence)
-
-        # Normalize both sentences for comparison
-        user_sentence_normalized = user_sentence.replace('.', '').lower()
-        correct_german_sentence_normalized = correct_german_sentence.replace('.', '').lower()
-
         # Check if the correctness of the user's sentence has been verified
         return self.correctness_checked and self.correct_sentence_matched
 
+    def reset(self):
+        # Reset all relevant attributes to their initial state
+        self.score = 0
+        self.correctness_checked = False
+        self.correct_sentence_matched = False
+        self.selected_words = []
+        self.selected_rects = []
+        random.shuffle(self.german_words)
+        self.message_text = ""
+        self.message_timer = 0
+
     def run(self):
+        pygame.init()
         running = True
         while running:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
+                    pygame.quit()
                     running = False
                 elif event.type == pygame.MOUSEBUTTONDOWN:
                     if self.next_button_clicked(event.pos):
                         # Move to the next exercise (replace with the instantiation of the next exercise class)
-                        next_exercise = GermanPronunciationExercise(self.screen)
-                        next_exercise.run()
+                        # next_exercise = GermanPronunciationExercise(self.screen)
+                        # next_exercise.run()
                         return  # Exit the current run method after moving to the next exercise
                     elif self.check_button_clicked(event.pos):
                         self.check_correctness()
@@ -537,7 +527,7 @@ if __name__ == "__main__":
     screen = pygame.display.set_mode((screen_width, screen_height))
     pygame.display.set_caption("Sentence Exercise")
 
-    exercise = SentenceExerciseGerman(screen)  # chnage it accoringly for the exercise
+    exercise = SentenceExerciseEnglish(screen)  # change it accordingly for the exercise
 
     running = True
     while running:
@@ -552,4 +542,5 @@ if __name__ == "__main__":
 
         exercise.draw()
 
-    pygame.quit()
+    pygame.quit()  # Call pygame.quit() only once, at the end of your program
+
